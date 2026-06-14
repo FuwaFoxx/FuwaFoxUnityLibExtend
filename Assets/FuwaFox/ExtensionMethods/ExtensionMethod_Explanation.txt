@@ -1,0 +1,82 @@
+﻿/*
+ * Last Updated: 14 June 2026
+ * By FuwaFox (Wei Li)
+ */
+
+
+How to make Extension methods?
+
+First: Prepare a static class like "Extensions"
+use "public static class Extensions" for example.
+
+we can then start to write our own methods/functions on top of the original one.
+Extension Method:   write a static function, the first parameter should use this keyword, 
+                    and followed by the class we want to extend. (can see the sample code below.)
+Note:   these are not going to overwrite the original class, 
+	    but to allow us to call the extended functions directly from the class we are extended.
+
+Example: 
+During development, we may need to reset player position to the origin, 
+the normal way to do this most likely is to create a function like ResetPlayerPosition(), 
+and then access the player instance and set its local transform for its scale, rotation, and position one by one.
+
+so here is the solution, instead of call player.transform.localScale / localRotation, etc. 
+we make an extension method to do this, so it only need one line of code, and the defined function will do the work.
+Let's create a ResetTransform method that extending from the Transform class
+
+Sample Code of adding a ResetTransform extension method to the class Transform:
+public static class Extensions
+{
+        public static void ResetTransform(this Transform transform)
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            transform.localScale = Vector3.one;
+        }
+}
+
+how to use this extension method?
+(the ResetTransform() function is now Available on top of the Tranform class!)
+
+changes to code:
+FROM:
+    private void ResetPlayerPos()
+    {
+        player.transform.localPosition = new Vector3(0, 0, 0);
+        player.transform.localRotation = Quaternion.identity;
+        player.transform.localScale = Vector3.one;
+    }
+
+TO: 
+    private void ResetPlayerPos()
+    {
+        player.transform.ResetTransform();
+    }
+
+that clean that simple!
+
+
+How it works?
+A: there is a specific way to tell the program that the function we write is an extension method;
+the keyword: this
+
+We create a static function, and the FIRST PARAMETER, we put "this", and followed by the CLASS we are EXTENDING.
+* we can then continue to define what the function will do ^^
+
+
+
+*** When To Use? (when it suitable, the pros and cons) ***
+* As stated above, we write this because the original class does not have the desired functions for this set of actions.
+  (1) It does not mean the function we write is suitable to be included into the base class.
+  (2) when you have access to the base class, you may directly change in the class but not to write an extension method.
+  (3) other co-workers might don't know there is something like this is existing, therefore, write in the old way
+        - leading to inconsistency, code duplication.
+
+* When to write one?
+  (1) when you don't have access to the original class but this solve you a lot of problems, ease your development.
+  (2) You, as a developer/asset creator, is making TOOLs, for others; 
+        - everyone know there is such thing existing,
+        - they may integrate your scripts into thier projects with no conflict, 
+          and no hard-requirement to change the original codes.
+        Perfect!
+
